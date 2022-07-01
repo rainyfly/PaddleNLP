@@ -32,7 +32,7 @@ def str2bool(v):
 # yapf: disable
 parser = argparse.ArgumentParser(__doc__)
 model_g = ArgumentGroup(parser, "model", "model configuration and paths.")
-model_g.add_arg("init_checkpoint", str, None, "Init checkpoint to resume training from.")
+model_g.add_arg("load_checkpoint", str, None, "Init checkpoint to resume training from.")
 model_g.add_arg("init_pretraining_params", str, None,
                 "Init pre-training params which preforms fine-tuning from. If the "
                 "arg 'init_checkpoint' has been set, this argument wouldn't be valid.")
@@ -44,6 +44,7 @@ model_g.add_arg("encoder_json_file", str, './model_files/dict/unimo_en.encoder.j
 model_g.add_arg("vocab_bpe_file", str, './model_files/dict/unimo_en.vocab.bpe', "vocab bpe")
 model_g.add_arg("unimo_config_path", str, "./model_files/config/unimo_base_en.json",
                 "The file to save unimo configuration.")
+model_g.add_arg("output_dir", str, "checkpoints", "Path to save checkpoints.")
 
 train_g = ArgumentGroup(parser, "training", "training options.")
 train_g.add_arg("epoch", int, 3, "Number of epoches for fine-tuning.")
@@ -129,4 +130,32 @@ parser.add_argument("--check_accuracy", type=str2bool, nargs='?', const=False, h
 parser.add_argument("--device", type=str, default="gpu", choices=["cpu", "gpu", "xpu"], help="select cpu, gpu, xpu devices.")
 parser.add_argument("--lr_decay_style", type=str, default="cosine", choices=["cosine", "none"], help="Learning rate decay style.")
 parser.add_argument("--share_folder", type=str2bool, nargs='?', const=False, help="Use share folder for data dir and output dir on multi machine.")
+
+ # Default training config
+parser.add_argument("--grad_clip", default=0.0, type=float, help="Grad clip for the parameter.")
+parser.add_argument("--max_lr", default=1e-5, type=float, help="The initial max learning rate for Adam.")
+parser.add_argument("--min_lr", default=5e-5, type=float, help="The initial min learning rate for Adam.")
+parser.add_argument("--warmup_rate", default=0.01, type=float, help="Linear warmup over warmup_steps for learing rate.")
+parser.add_argument("--decay_steps", default=360000, type=int, help="The steps use to control the learing rate. If the step > decay_steps, will use the min_lr.")
+parser.add_argument("--max_steps", default=500000, type=int, help="If > 0: set total number of training steps to perform. Override num_train_epochs.")
+
+# Adam optimizer config
+parser.add_argument("--adam_beta1", default=0.9, type=float, help="The beta1 for Adam optimizer. The exponential decay rate for the 1st moment estimates.")
+parser.add_argument("--adam_beta2", default=0.999, type=float, help="The bate2 for Adam optimizer. The exponential decay rate for the 2nd moment estimates.")
+parser.add_argument("--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer.")
+
+# AMP config
+parser.add_argument("--use_amp", type=str2bool, nargs='?', const=False, help="Enable mixed precision training.")
+parser.add_argument("--enable_addto", type=str2bool, nargs='?', const=True, default=True, help="Whether to enable the addto strategy for gradient accumulation or not. This is only used for AMP training.")
+parser.add_argument("--scale_loss", type=float, default=32768, help="The value of scale_loss for fp16. This is only used for AMP training.")
+parser.add_argument("--hidden_dropout_prob", type=float, default=0.1, help="The hidden dropout prob.")
+parser.add_argument("--attention_probs_dropout_prob", type=float, default=0.1, help="The attention probs dropout prob.")
+
+# Training steps config
+parser.add_argument("--num_train_epochs", default=1, type=int, help="Total number of training epochs to perform.", )
+parser.add_argument("--checkpoint_steps", type=int, default=500, help="Save checkpoint every X updates steps to the model_last folder.")
+parser.add_argument("--logging_freq", type=int, default=10, help="Log every X updates steps.")
+parser.add_argument("--eval_freq", type=int, default=500, help="Evaluate for every X updates steps.")
+parser.add_argument("--eval_iters", type=int, default=10, help="Evaluate the model use X steps data.")
+
 

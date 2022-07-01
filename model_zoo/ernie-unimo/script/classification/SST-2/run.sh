@@ -10,8 +10,8 @@ source ./utils.sh
 
 check_iplist
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6
-output_dir=./output/${task}
+export CUDA_VISIBLE_DEVICES=2,4
+output_dir=./temp_output/${task}
 log_dir=${output_dir}/log
 save_model_base_dir=$output_dir/save_model
 mkdir -p $output_dir $log_dir $save_model_base_dir
@@ -44,7 +44,7 @@ fi
 #         fi
 log_prefix='output_log'
 
-python -u ./src/run_classifier_dynamic.py --use_cuda "True" \
+python -u -m paddle.distributed.launch --gpus=2,4 ./src/run_classifier_dynamic.py --use_cuda "True" \
             --is_distributed ${is_distributed:-"False"} \
             --weight_sharing ${weight_sharing:-"True"} \
             --use_fast_executor ${e_executor:-"true"} \
@@ -64,6 +64,7 @@ python -u ./src/run_classifier_dynamic.py --use_cuda "True" \
             --do_pred ${do_pred:-"True"} \
             --pred_save ${pred_save:-"./output/predict/test"} \
             --batch_size ${bs:-16} \
+            --load_checkpoint ${load_checkpoint:-""} \
             --init_pretraining_params ${init_model:-""} \
             --train_set ./data/SST-2/train.tsv \
             --dev_set ./data/SST-2/dev.tsv \

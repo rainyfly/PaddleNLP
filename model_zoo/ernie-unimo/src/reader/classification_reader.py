@@ -128,11 +128,9 @@ class ClassifyReader(Dataset):
         return len(self.examples)
 
     def __getitem__(self, idx):
-        print('idx', idx)
         example = self.examples[idx]
         record = self._convert_example_to_record(example, self.max_seq_len,
                                                      self.tokenizer)
-        print(record)
         return record
                 
 

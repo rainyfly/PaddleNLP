@@ -22,7 +22,7 @@ BATCH_SIZE=("16" "32")
 LR_RATE=("1e-5" "2e-5" "3e-5")
 DD_RAND_SEED=("1" "2" "3" "4" "5")
 
-init_model="./model_files/unimo_base_en"
+init_model="./pretrain_model/unimo_base/"
 config_path="./model_files/config/unimo_base_en.json"
 vocab_file="./model_files/dict/unimo_en.vocab.txt"
 bpe_json="./model_files/dict/unimo_en.encoder.json"

@@ -181,7 +181,7 @@ class UNIMOEncoder(nn.Layer):
         else:
             raise ValueError("The input type is invalid")
 
-        enc_out, results = self.encoder(emb_feature, n_head_self_attn_mask)
+        enc_out = self.encoder(emb_feature, n_head_self_attn_mask)
 
         if input_type == 'vol':
             assert _v_seq_len is not None and _o_seq_len is not None, "the input is invalid"

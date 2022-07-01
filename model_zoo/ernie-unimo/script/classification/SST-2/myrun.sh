@@ -16,7 +16,7 @@ log_dir=${output_dir}/log
 save_model_base_dir=$output_dir/save_model
 mkdir -p $output_dir $log_dir $save_model_base_dir
 
-python3.7 -u ./src/run_myunimo.py --use_cuda "True" \
+python -u -m paddle.distributed.launch ./src/run_myunimo.py --use_cuda "True" \
             --is_distributed ${is_distributed:-"False"} \
             --weight_sharing ${weight_sharing:-"True"} \
             --use_fast_executor ${e_executor:-"true"} \
